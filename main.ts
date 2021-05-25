@@ -43,14 +43,14 @@ basic.forever(function () {
         direction = pins.digitalReadPin(DigitalPin.P15)
     }
     if (direction == 1) {
-        if (footPedal1 > 50 && seatSwitch == 0) {
+        if (footPedal1 > 50 && seatSwitch == 1) {
             speed = footPedal1
             goForward()
         } else {
             Stop()
         }
     } else {
-        if (footPedal1 > 50 && seatSwitch == 0) {
+        if (footPedal1 > 50 && seatSwitch == 1) {
             speed = footPedal1
             goBackward()
         } else {
