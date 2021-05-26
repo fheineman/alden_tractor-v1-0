@@ -10,6 +10,13 @@ function goForward () {
     pins.digitalWritePin(DigitalPin.P14, 1)
     pins.analogWritePin(AnalogPin.P1, speed)
 }
+radio.onReceivedValue(function (name, value) {
+    if (name == "joyH") {
+        joyH = value
+    } else if (name == "joyV") {
+        joyV = value
+    }
+})
 function Stop () {
     pins.digitalWritePin(DigitalPin.P13, 0)
     pins.digitalWritePin(DigitalPin.P14, 0)
@@ -20,11 +27,17 @@ function Stop () {
 let seatSwitch = 0
 let footPedal1 = 0
 let speed = 0
+let joyV = 0
+let joyH = 0
 led.enable(false)
 Stop()
 pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
 let direction = 1
+radio.setGroup(1)
+let enableRC = 0
+joyH = 512
+joyV = 512
 music.playMelody("C E G C5 - G C5 C5 ", 360)
 music.playTone(523, music.beat(BeatFraction.Breve))
 music.setTempo(120)
@@ -37,6 +50,7 @@ basic.forever(function () {
 basic.forever(function () {
     footPedal1 = Math.map(pins.analogReadPin(AnalogPin.P3), 250, 790, 0, 1023)
     seatSwitch = pins.digitalReadPin(DigitalPin.P16)
+    enableRC = pins.digitalReadPin(DigitalPin.P9)
 })
 basic.forever(function () {
     if (pins.digitalReadPin(DigitalPin.P15) != direction && footPedal1 < 50) {
@@ -55,6 +69,17 @@ basic.forever(function () {
             goBackward()
         } else {
             Stop()
+        }
+    }
+})
+basic.forever(function () {
+    if (enableRC == 1) {
+        if (joyV > 550) {
+            speed = Math.map(joyV, 550, 1023, 10, 255)
+            goForward()
+        } else if (joyV < 450) {
+            speed = Math.map(joyV, 0, 450, 255, 10)
+            goBackward()
         }
     }
 })
