@@ -24,6 +24,7 @@ function Stop () {
     pins.analogWritePin(AnalogPin.P1, speed)
     pins.digitalWritePin(DigitalPin.P8, 0)
 }
+let enableAdult = 0
 let seatSwitch = 0
 let footPedal1 = 0
 let speed = 0
@@ -31,6 +32,8 @@ let joyV = 0
 let joyH = 0
 led.enable(false)
 Stop()
+pins.setPull(DigitalPin.P7, PinPullMode.PullUp)
+pins.setPull(DigitalPin.P9, PinPullMode.PullDown)
 pins.setPull(DigitalPin.P15, PinPullMode.PullUp)
 pins.setPull(DigitalPin.P16, PinPullMode.PullUp)
 let direction = 1
@@ -41,17 +44,6 @@ joyV = 512
 music.playMelody("C E G C5 - G C5 C5 ", 360)
 music.playTone(523, music.beat(BeatFraction.Breve))
 music.setTempo(120)
-basic.forever(function () {
-    if (direction == 0) {
-        music.playTone(988, music.beat(BeatFraction.Whole))
-        music.rest(music.beat(BeatFraction.Whole))
-    }
-})
-basic.forever(function () {
-    footPedal1 = Math.map(pins.analogReadPin(AnalogPin.P3), 250, 790, 0, 1023)
-    seatSwitch = pins.digitalReadPin(DigitalPin.P16)
-    enableRC = pins.digitalReadPin(DigitalPin.P9)
-})
 basic.forever(function () {
     if (pins.digitalReadPin(DigitalPin.P15) != direction && footPedal1 < 50) {
         direction = pins.digitalReadPin(DigitalPin.P15)
@@ -71,6 +63,19 @@ basic.forever(function () {
             Stop()
         }
     }
+})
+basic.forever(function () {
+    if (direction == 0) {
+        music.playTone(988, music.beat(BeatFraction.Whole))
+        music.rest(music.beat(BeatFraction.Whole))
+    }
+})
+basic.forever(function () {
+    footPedal1 = Math.map(pins.analogReadPin(AnalogPin.P3), 250, 790, 0, 1023)
+    enableAdult = pins.digitalReadPin(DigitalPin.P7)
+    enableRC = pins.digitalReadPin(DigitalPin.P7)
+    direction = pins.digitalReadPin(DigitalPin.P15)
+    seatSwitch = pins.digitalReadPin(DigitalPin.P16)
 })
 basic.forever(function () {
     if (enableRC == 1) {
